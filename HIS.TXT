@@ -1,0 +1,5 @@
+Este es un archivo de texto de prueba de lectura
+desde un programa en assembler.
+Los textos tienen que estar finalizados con <Enter>,
+en binario es 0Dh 0Ah.
+Espero se pueda leer en pantalla. Saludos!
