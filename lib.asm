@@ -2,75 +2,111 @@
 .model small 
 .stack 100h
 .data
-	cartel			db "---------------Flappy Bird--------------"	, 0dh, 0ah
-					db "1. iniciar el juego"						, 0dh, 0ah
-					db "2. historial"								, 0dh, 0ah
-					db "3. salir"									, 0dh, 0ah, 24h
+	archivo				db 'his.txt',0	;nombre del archivo a leer o escribir
+	filehandler			dw 0			
+	
+	len			equ 1
+	buf		db 1 dup(?)		;buffer de lectura del archivo 1
+	cola		db '$'
+	errmsg		db 10,13,'Error apertura Archivo UNO.TXT!',10,13,'$'
+	cantreng	db 39
 
-	entre			db 0dh, 0ah, 24h
-
-	error1			db "error: ingrese una opcion que este en el menu", 0dh, 0ah, 24h
 .code
-	public menu
 	public clearscreen
-
-	extrn leer:proc
-
-	menu proc
+	public leer
+	
+	leer proc
 		push ax
+		push bx
+		push ds
+		push di
 		push dx
-
-			call clearscreen
-
-			mov ah, 09h
-			lea dx, cartel
-			int 21h
-
-			forMenu:
-				mov ah, 01h				
+		push cx
+			uno:
+				mov ax,@data
+			    mov ds,ax
+				
+				call clearscreen
+			    
+			    lea dx,archivo
+			    mov ax,3d00h
+			    int 21h
+			    
+			    jc wrong
+			    mov filehandler,ax
+			    
+			otrocar:
+				mov bx,filehandler
+			    mov ah,3fh
+			    mov cx,len
+			    
+			    lea dx,buf
+			    int 21h
+			    
+			    cmp ax,0
+				je endoffile
+				
+				lea dx, buf 
+			    mov ah,9
 				int 21h
 				
-				cmp al, 31h				;comparo si es 1 para iniciar el juego
-				je start
+				cmp buf,0Ah
+				je checkpage
 				
-				cmp al, 32h				;comparo si es 2 para mostrar el historial
-				je historial
-					
-				cmp al, 33h				;comparo si es 3 asi salgo del juego 
-				je quit
+				jmp otrocar
 
+			checkpage:
+				push bx
+				push di
+				
+				mov bl, cantreng
+				
+				inc bl
+				
+				cmp bl,39
+				jne sigo123
+				
 				call clearscreen
+			sigo123:
+				mov bl,0
+				inc bl
+				
+				lea di,cantreng
+				
+				mov byte ptr[di],bl
+				
+				pop di
+				pop bx
+				jmp otrocar
+				
+			endoffile:				
+				mov bx,filehandler 	; coloco en BX el file handler del archivo abierto
+				mov ah,3eh
+			    int 21h        ;cierra archivo
+			    jmp fin
 
-				mov ah, 09h
-				lea dx, cartel
-				int 21h
+			wrong:    
+				lea dx,errmsg
+			    mov ah,9
+			    int 21h        ;muestra mensaje de error
+			fin:
+				mov ah,4ch
+			    int 21h        ;retorna al ss oo
+		push ax
+		push bx
+		push ds
+		push di
+		push dx
+		push cx
 
-				mov ah, 09h
-				lea dx, entre
-				int 21h
-
-				mov ah, 09h
-				lea dx, error1
-				int 21h
-
-			jmp forMenu
-
-			start:
-				call clearscreen
-			jmp quit
-
-
-			historial:
-				call clearscreen
-				call leer 
-			jmp quit
-
-			quit:
-
-		pop dx 
+		pop cx
+		pop dx
+		pop di
+		pop ds 
+		pop bx
 		pop ax
 		ret
-	menu endp
+	leer endp
 
 	clearscreen proc 
 		push ax
@@ -97,5 +133,4 @@
 		pop ax
 		ret 
 	clearscreen endp
-
 end
