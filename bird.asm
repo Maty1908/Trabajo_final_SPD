@@ -19,7 +19,7 @@
             		db 26 dup(' '), "2. historial", 0dh, 0ah
             		db 26 dup(' '), "3. salir", 0dh, 0ah, 24h
 
-	agradecimiento	db 02h 	   ," gracias por haber jugado a nuestro juego y por la cursada ",02h , 0dh, 0ah, 24h
+	agradecimiento	db 02h 	   ," gracias por haber jugado a nuestro juego y por la cursada, los queremos Fabio y Pedro ",02h , 0dh, 0ah, 24h
 
 	entre			db 0dh, 0ah, 24h
 
